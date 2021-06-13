@@ -15,7 +15,19 @@
     </head>
     <body>
         <%@include file="WEB-INF/jspf/header.jspf" %>
-        <h2>Início</h2>
-        <div>Página inicial</div>
+        <table border="1">
+            <tr>
+                <td>RA: 1290481923001</td>
+            </tr>
+            <tr>
+                <td>Angelo Marcio Sousa Santos</td>
+            </tr>
+            <tr>
+                <td>Ingressou na FatecPG no Segundo Semestre de 2019</td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/AngeloMaverick">Github AngeloMaverick</a></td>
+            </tr>
+        </table>
     </body>
 </html>
