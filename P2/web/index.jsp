@@ -6,8 +6,14 @@
 
 <%@page import="java.util.ArrayList"%>
 <%@page import="db.User"%>
+<%@page import="db.Disciplina"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%
+    request.setCharacterEncoding("UTF-8");
+    ArrayList<Disciplina> disciplinas = new ArrayList<>();
+    disciplinas = Disciplina.getDisciplinas();
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -29,5 +35,19 @@
                 <td><a href="https://github.com/AngeloMaverick">Github AngeloMaverick</a></td>
             </tr>
         </table>
+        <%if(session.getAttribute("user.login")!=null){%>
+            <table border="1">
+                <tr>
+                    <th>Disciplina</th>
+                    <th>Média</th>
+                </tr>
+                <%for (Disciplina disciplina: disciplinas) {%>
+                    <tr>
+                        <td><%= disciplina.getNome() %></td>
+                        <td><%= (float)(disciplina.getP1() + disciplina.getP2())/2 %></td>
+                    </tr>
+                <%}%>
+            </table>
+        <%}%>
     </body>
 </html>
