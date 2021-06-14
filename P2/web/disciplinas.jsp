@@ -4,8 +4,38 @@
     Author     : Desktop
 --%>
 
+<%@page import="java.util.ArrayList"%>
+<%@page import="db.Disciplina"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%
+    request.setCharacterEncoding("UTF-8");
+    String requestError = null;
+    ArrayList<Disciplina> disciplinas = new ArrayList<>();
+    try{
+        if(request.getParameter("INSERT")!=null){
+            String nome = request.getParameter("NOME");
+            String diaDaSemana = request.getParameter("DIA_DA_SEMANA");
+            String horario = request.getParameter("HORARIO");
+            String qtdAulas = request.getParameter("QTD_AULAS");            
+            Disciplina.insertDisciplina(nome, diaDaSemana, horario, Integer.parseInt(qtdAulas));
+            response.sendRedirect(request.getRequestURI());
+        }else if(request.getParameter("DELETE")!=null){
+            String nome = request.getParameter("NOME");
+            Disciplina.deleteDisciplina(nome);
+            response.sendRedirect(request.getRequestURI());
+        }else if(request.getParameter("CHANGE")!=null){
+            String nome = request.getParameter("NOME");
+            String p1 = request.getParameter("P1");
+            String p2 = request.getParameter("P2");
+            Disciplina.changeProva(nome, Integer.parseInt(p1), Integer.parseInt(p2));
+            response.sendRedirect(request.getRequestURI());
+        }
+        disciplinas = Disciplina.getDisciplinas();
+    }catch(Exception ex){
+        requestError = ex.getMessage();
+    }
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -13,7 +43,9 @@
     </head>
     <body>
         <%@include file="WEB-INF/jspf/header.jspf" %>            
-        
+        <%if(requestError!=null){%>
+            <div style="color: red"><%= requestError %></div>
+        <%}%>
         <%if(session.getAttribute("user.login") == null) {%>
             <div style="color:red">
                 Erro: Você precisa estar identificado para ter acesso a este conteúdo!
@@ -22,63 +54,42 @@
             <form>
                 <table border="1">
                      <tr>
+                        <th>Disciplina</th>
                         <th>Dia da semana</th>
                         <th>Horário</th>
-                        <th>Disciplina</th>
+                        <th>Qtd Aulas</th>
                         <th>P1</th>
                         <th>P2</th>
                     </tr>
-                    <tr>
-                        <td>Segunda-Feira</td>
-                        <td>19h00-22h30</td>
-                        <td>Programação Orientada a Objetos</td>
-                        <td><input type="text" name="PooP1" value="<%= session.getAttribute("PooP1") %>"/></td>
-                        <td><input type="text" name="PooP2" value="<%= session.getAttribute("PooP2") %>"/></td>
-                    </tr>
-                    <tr>
-                        <td>Terça-Feira</td>
-                        <td>19h00-22h30</td>
-                        <td>Engenharia de Software III</td>
-                        <td><input type="text" name="EsP1" value="<%= session.getAttribute("EsP1") %>"/></td>
-                        <td><input type="text" name="EsP2" value="<%= session.getAttribute("EsP2") %>"/></td>
-                    </tr>
-                    <tr>
-                        <td>Quarta-Feira</td>
-                        <td>19h00-22h30</td>
-                        <td>Sistemas Operacionais II</td>
-                        <td><input type="text" name="SoP1" value="<%= session.getAttribute("SoP1") %>"/></td>
-                        <td><input type="text" name="SoP2" value="<%= session.getAttribute("SoP2") %>"/></td>
-                    </tr>
-                    <tr>
-                        <td>Quinta-Feira</td>
-                        <td>19h00-22h30</td>
-                        <td>Linguagem de Programação IV - INTERNET</td>
-                        <td><input type="text" name="LpP1" value="<%= session.getAttribute("LpP1") %>"/></td>
-                        <td><input type="text" name="LpP2" value="<%= session.getAttribute("LpP2") %>"/></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">Sexta-Feira</td>
-                        <td>19h00-20h40</td>
-                        <td>Metodologia da Pesquisa Científico-Tecnológica</td>
-                        <td><input type="text" name="MpctP1" value="<%= session.getAttribute("MpctP1") %>"/></td>
-                        <td><input type="text" name="MpctP2" value="<%= session.getAttribute("MpctP2") %>"/></td>
-                    </tr>
-                    <tr>
-
-                        <td>20h50-22h30</td>
-                        <td>Segurança da Informação</td>
-                        <td><input type="text" name="SiP1" value="<%= session.getAttribute("SiP1") %>"/></td>
-                        <td><input type="text" name="SiP2" value="<%= session.getAttribute("SiP2") %>"/></td>
-                    </tr>
-                    <tr>
-                        <td>Sábado</td>
-                        <td>8h00-11h30</td>
-                        <td>Banco de Dados</td>
-                        <td><input type="text" name="BdP1" value="<%= session.getAttribute("BdP1") %>"/></td>
-                        <td><input type="text" name="BdP2" value="<%= session.getAttribute("BdP2") %>"/></td>
-                    </tr>
+                    <%for (Disciplina disciplina: disciplinas) {%>
+                        <tr>
+                            <td><%= disciplina.getNome() %></td>
+                            <td><%= disciplina.getDiaDaSemana() %></td>
+                            <td><%= disciplina.getHorario() %></td>
+                            <td><%= disciplina.getQtdAulas() %></td>
+                            <form method="post">
+                                <input type="hidden" name="NOME" value="<%= disciplina.getNome() %>"/>
+                                <td><input type="text" name="P1" value="<%= disciplina.getP1() %>"/></td>
+                                <td><input type="text" name="P2" value="<%= disciplina.getP2() %>"/></td>
+                                <td><input type="submit" name="CHANGE" value="Salvar"/></td>
+                            </form>
+                            <td>
+                                <form method="post">
+                                    <input type="hidden" name="NOME" value="<%= disciplina.getNome() %>"/>
+                                    <input type="submit" name="DELETE" value="Excluir"/>
+                                </form>
+                            </td>
+                        </tr>
+                    <%}%>
                 </table>
-                <input type="submit" name="save" value="Salvar Notas" style="padding: 5px; margin: 5px;"/>
+                <hr/>
+                <form method="post">
+                    Disciplina:<input type="text" name="NOME"/>
+                    Dia da Semana:<input type="text" name="DIA_DA_SEMANA"/>
+                    Horario:<input type="text" name="HORARIO"/>
+                    Qtd Aulas:<input type="text" name="QTD_AULAS"/>
+                    <input type="submit" name="INSERT" value="Inserir"/>
+                </form>
             </form>
         <%} %>
     </body>
